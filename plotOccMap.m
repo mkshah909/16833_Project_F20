@@ -1,8 +1,7 @@
 function plotOccMap(map)
 % generate plot to show occupancy map created by genOccMap.m
-figure()
-hold on
-axis equal
+% figHandle = figure();
+
 X = [];
 Y = [];
 
@@ -15,9 +14,12 @@ for y = 1:size(map, 1)
         end
     end
 end
+
+scatter(X, Y, 10,'MarkerEdgeColor',[0 0 0], 'MarkerFaceColor',[0 0 0])
+hold on
+axis equal
 xlim([0, x])
 ylim([0,y])
-scatter(X, Y, 10,'MarkerEdgeColor',[0 0 0], 'MarkerFaceColor',[0 0 0])
 xlabel('x (cm)')
 ylabel('y (cm)')
 

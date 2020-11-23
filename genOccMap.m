@@ -40,16 +40,17 @@ map(1:currentHeight, currentX+1:currentX+50) = 1;
 currentX = currentX + 50;
 
 % populate obstacle
-map(1:currentHeight+stepHeight*1.5, currentX+1:currentX+stepWidth*0.5) = 1;
-currentX = currentX + stepWidth*0.5;
+map(1:currentHeight+round(stepHeight*1.5),...
+    currentX+1:currentX+round(stepWidth*0.5)) = 1;
+currentX = currentX + round(stepWidth*0.5);
 
 % populate some more flat ground
 map(1:currentHeight, currentX+1:currentX+75) = 1;
 currentX = currentX+75;
 
 % populate obstacle
-map(1:currentHeight+stepHeight*0.5, currentX+1:currentX+stepWidth*1.5) = 1;
-currentX = currentX + stepWidth*1.5;
+map(1:currentHeight+round(stepHeight*0.5), currentX+1:currentX+round(stepWidth*1.5)) = 1;
+currentX = currentX + round(stepWidth*1.5);
 
 % populate some more flat ground
 map(1:currentHeight, currentX+1:currentX+50) = 1;
@@ -60,7 +61,7 @@ rampLength = 50;
 % populate ramp up
 for i = 1:rampLength
     map(1:round(currentHeight+0.5), currentX+1:currentX+2) = 1;
-    currentHeight = currentHeight + 0.5;
+    currentHeight = round(currentHeight + 0.5);
     currentX = currentX + 1;
 end
 
