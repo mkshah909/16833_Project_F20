@@ -19,7 +19,7 @@ scatter(X, Y, 10,'MarkerEdgeColor',[0 0 0], 'MarkerFaceColor',[0 0 0])
 hold on
 axis equal
 xlim([0, x])
-ylim([0,y])
+ylim([0, y])
 xlabel('x (cm)')
 ylabel('y (cm)')
 
