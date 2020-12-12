@@ -9,10 +9,11 @@ clear
 clc
 
 %% Read Recorded Data and saved laser object
-saveSimMeas = load('Data/saveSimMeas50Short.txt');
-saveIdealMeas = load('Data/saveIdealMeas50Short.txt');
-trueTrajectory = load('Data/trueTrajectory50Short.txt'); % (3, n) x, y, theta
-laser = load('Data/laser50Short.mat');
+filenameSuffix = '50Short';
+saveSimMeas = load(['Data/saveSimMeas', filenameSuffix, '.txt']);
+saveIdealMeas = load(['Data/saveIdealMeas', filenameSuffix, '.txt']);
+trueTrajectory = load(['Data/trueTrajectory', filenameSuffix, '.txt']); % (3, n) x, y, theta
+laser = load(['Data/laser', filenameSuffix, '.mat']);
 laser = laser.laser; % pull object from struc
 pose = trueTrajectory(:,1);
 numScans = size(saveSimMeas, 1);
@@ -36,8 +37,25 @@ angles = deg2rad(laser.rayAngles) - pi/2;
 refScan = lidarScan(laser.idealMeas, angles);
 
 %% SLAM loop
+truePose = trueTrajectory(:, 1); % not used, just for comparison
+estTrajectory = pose;
+
 figure
-for i = 2:49 %numScans
+
+mapPoints = transformScan(refScan, pose);
+mapPoints = mapPoints.Cartesian;
+subplot(2,2,[3,4])
+scatter(mapPoints(:,1), mapPoints(:,2), '.')
+axis equal
+xlim([0, 600])
+ylim([0, 250])
+xlabel('x (cm)')
+ylabel('y (cm)')
+hold on
+scatter(pose(1), pose(2), '*')
+scatter(truePose(1), truePose(2), 'o')
+
+for i = 2:numScans
     % Read in range measurements from saved data file
     laser.simMeas = saveSimMeas(i, :);
     laser.idealMeas = saveIdealMeas(i, :);
@@ -107,22 +125,29 @@ for i = 2:49 %numScans
     title('Aligned Scans')
     hold off
     
-%     pose = pose + poseDiff';
-%     disp(pose)
-%     refScan = newScan;
-%     mapPoints = transformScan(newScan, pose);
-%     mapPoints = mapPoints.Cartesian;
-%     subplot(2,2,[3,4])
-%     scatter(mapPoints(:,1), mapPoints(:,2), '.')
-%     axis equal
-%     xlim([0, 600])
-%     ylim([0, 250])
-%     xlabel('x (cm)')
-%     ylabel('y (cm)')
-%     hold on
-%     truePose = trueTrajectory(:, i); % not used, just for comparison
-%     estTrajectory = [estTrajectory, pose];
-%     pause(0.001)
+    mapPoints = transformScan(newScanTformd, pose);
+    mapPoints = mapPoints.Cartesian;
+    
+    position = trilateration2D(mapPoints, saveIdealMeas(i, :));
+    pose(1:2) = position;
+    pose(3) = pose(3) + poseDiff(3);
+    truePose = trueTrajectory(:, i); % not used, just for comparison
+    estTrajectory = [estTrajectory, pose];
+    
+    subplot(2,2,[3,4])
+    scatter(mapPoints(:,1), mapPoints(:,2), '.')
+    axis equal
+    xlim([0, 600])
+    ylim([0, 250])
+    xlabel('x (cm)')
+    ylabel('y (cm)')
+    hold on
+    scatter(pose(1), pose(2), '*')
+    scatter(truePose(1), truePose(2), 'o')
+    
+    % Update refScan for next step
+    refScan = newScan;
+    pause(0.001)
 end
 
 figure

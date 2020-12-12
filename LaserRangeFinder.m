@@ -111,9 +111,9 @@ classdef LaserRangeFinder < handle
                     singleMeas = obj.idealMeas(i);
                 end
                 x2 = pose(1) + singleMeas*cos(-pi/2 + pose(3)...
-                    + deg2rad(obj.rayAngles(i)+1));
+                    + deg2rad(obj.rayAngles(i)));
                 y2 = pose(2) + singleMeas*sin(-pi/2 + pose(3)...
-                    + deg2rad(obj.rayAngles(i)+1));
+                    + deg2rad(obj.rayAngles(i)));
                 scanX = [scanX, x2];
                 scanY = [scanY, y2];
             end

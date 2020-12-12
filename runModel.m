@@ -11,10 +11,10 @@ map = genOccMap();
 % plotOccMap(map);
 
 %% Read Recorded Data and saved laser object
-saveSimMeas = load('saveSimMeas50Short.txt');
-saveIdealMeas = load('saveIdealMeas50Short.txt');
-trueTrajectory = load('trueTrajectory50Short.txt'); % (3, n) x, y, theta
-laser = load('laser50Short.mat');
+saveSimMeas = load('Data/saveSimMeas50Short.txt');
+saveIdealMeas = load('Data/saveIdealMeas50Short.txt');
+trueTrajectory = load('Data/trueTrajectory50Short.txt'); % (3, n) x, y, theta
+laser = load('Data/laser50Short.mat');
 laser = laser.laser; % pull object from struc
 pose = trueTrajectory(:,1);
 numScans = size(saveSimMeas, 1);
@@ -99,6 +99,7 @@ for i = 2:49 %numScans
             'CompatibilityScale', CompatibilityScale,...
             'MinPointsPerLine', MinPointsPerLine,...
             'LineMergeThreshold', LineMergeThreshold);
+        exampleHelperShowLineFeaturesInScan(refScan, newScan, debugInfo, initGuess);
         % Reorder reference features for direct correlation with current
         % features
         matchHypothesis = debugInfo.MatchHypothesis(debugInfo.MatchHypothesis>0);

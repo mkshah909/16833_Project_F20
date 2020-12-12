@@ -11,8 +11,9 @@ map = genOccMap();
 plotOccMap(map);
 
 %% Test generation of IMU poses
+filenameSuffix = '12111515';
 saveNewData = true;
-numPoints = 50;
+numPoints = 200;
 yPoints = [100; 110; 125; 140]; % 150; 170; 155; 200];
 xPoints = [25; 100; 200; 300]; % 400; 500; 600; 700];
 trajPoly = polyfit(xPoints, yPoints, 3);
@@ -25,7 +26,7 @@ title('Visualize occupancy map with trajectory');
 theta = deg2rad(-45 + 2*sin(0.1*linspace(1, 600, numPoints)));
 trueTrajectory = [xTraj; yTraj; theta];
 if saveNewData
-    writematrix(trueTrajectory)
+    writematrix(trueTrajectory, ['Data/trueTrajectory', filenameSuffix, '.txt'])
 end
 % % Attempt to simulate IMU sensor, P4
 % duration = 4; % [s], total duration of sim
@@ -37,16 +38,17 @@ end
 %% Test LaserRangeFinder class and ideal measurements (ray casting) w/ plotting
 saveSimMeas = [];
 saveIdealMeas = [];
-resolution = 150;
+resolution = 180;
 featureInterval = 3;
 planeSmoothThres = 0.7;
 edgeSmoothThres = 0.1;
 sigmaLaser = 0.5;
 isNoisy = true;
-laserSpan = 75; % [deg]
+laserSpan = 90; % [deg]
 laser = LaserRangeFinder(700, map, sigmaLaser, resolution, laserSpan, featureInterval); % initialize laser range finder obj
 if saveNewData
-    save 'laser.mat' laser
+    laserFilename = ['Data/laser', filenameSuffix, '.mat'];
+    save(laserFilename, 'laser')
 end
 f = figure;
 f.Position = [100, 300, 1200, 450];
@@ -65,8 +67,8 @@ for i = 1:numPoints
 end
 
 if saveNewData
-    writematrix(saveSimMeas)
-    writematrix(saveIdealMeas)
+    writematrix(saveSimMeas, ['Data/saveSimMeas', filenameSuffix, '.txt'])
+    writematrix(saveIdealMeas, ['Data/saveIdealMeas', filenameSuffix, '.txt'])
 end
 
 % f2 = figure;
