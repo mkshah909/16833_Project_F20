@@ -67,17 +67,15 @@ while i < numIter && error > errThres
     newScan = transformScan(newScan, poseDiff);
     error = sqrt(sum((A*poseDiff - b).^2)/valid_pair_num);
     
-    subplot(2,2,2);
-    plot(newScan)
-    hold on
-    plot(refScan)
-    title('Aligned Scans')
-    hold off
-    poseDiffFinal = poseDiffFinal + poseDiff;
-end
+%     Debugging plots
+%     subplot(2,2,2);
+%     plot(newScan)
+%     hold on
+%     plot(refScan)
+%     title('Aligned Scans')
+%     hold off
 
-if error > errThres
-    disp('error threshold not met')
+    poseDiffFinal = poseDiffFinal + poseDiff;
 end
 
 end
