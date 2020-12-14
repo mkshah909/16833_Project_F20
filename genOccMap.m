@@ -10,7 +10,7 @@ map = zeros(300, 800);
 currentHeight = 25; % [cm]
 currentX = 100;
 stepHeight = 10; % [cm]
-stepWidth = 25; % [cm]
+stepWidth = 35; % [cm]
 numStepUp = 7;
 numStepDown = 3;
 
