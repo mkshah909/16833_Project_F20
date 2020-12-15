@@ -1,6 +1,6 @@
 function [poseDiffFinal, valid_pair_num, error] = pointToPlaneICP(newScan, refScan)
 % newScan and refScan are lidarScan objects
-numIter = 10;
+numIter = 50;
 errThres = 4e-1;
 poseDiffFinal = [1;1;0];
 newScan = transformScan(newScan, poseDiffFinal);

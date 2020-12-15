@@ -11,19 +11,19 @@ map = genOccMap();
 plotOccMap(map);
 
 %% Test generation of IMU poses
-filenameSuffix = '12111945';
-saveNewData = false;
-numPoints = 100;
-yPoints = [100; 110; 150; 170]; % 150; 170; 155; 200];
-xPoints = [25; 100; 200; 300]; % 400; 500; 600; 700];
+filenameSuffix = '12141834'; % mmddhhmm
+saveNewData = true;
+numPoints = 75;
+yPoints = [75; 100; 150; 170];% [170; 150; 160; 130]; % 150; 170; 155; 200];
+xPoints = [25; 100; 200; 300]% [300; 375; 475; 575]; % 400; 500; 600; 700];
 trajPoly = polyfit(xPoints, yPoints, 3);
 xTraj = linspace(25,300,numPoints);
 yTraj = polyval(trajPoly, xTraj)...
-    + 4*sin(0.1*linspace(1, 300, numPoints));
+    + 6*sin(0.1*linspace(1, 300, numPoints));
 zTraj = zeros(1, numPoints);
-plot(xTraj, yTraj)
+plot(xTraj, yTraj, 'g')
 title('Visualize occupancy map with trajectory');
-theta = deg2rad(-45 + 2*sin(0.2*linspace(1, 600, numPoints)));
+theta = deg2rad(-45 + 5*sin(0.1*linspace(1, 600, numPoints)));
 trueTrajectory = [xTraj; yTraj; theta];
 if saveNewData
     writematrix(trueTrajectory, ['Data/trueTrajectory', filenameSuffix, '.txt'])
@@ -32,13 +32,13 @@ end
 %% Test LaserRangeFinder class and ideal measurements (ray casting) w/ plotting
 saveSimMeas = [];
 saveIdealMeas = [];
-resolution = 180;
+laserSpan = 75; % [deg]
+resolution = 150;
 featureInterval = 3;
 planeSmoothThres = 0.7;
 edgeSmoothThres = 0.1;
 sigmaLaser = 0.5;
 isNoisy = true;
-laserSpan = 90; % [deg]
 laser = LaserRangeFinder(700, map, sigmaLaser, resolution, laserSpan, featureInterval); % initialize laser range finder obj
 if saveNewData
     laserFilename = ['Data/laser', filenameSuffix, '.mat'];
@@ -57,11 +57,13 @@ for i = 1:numPoints
     saveSimMeas = [saveSimMeas; laser.simMeas'];
     saveIdealMeas = [saveIdealMeas; laser.idealMeas'];
     
-    filename = ['Figures/sim1/gridAndCast', num2str(i), '.jpg'];
-    if ~exist('Figures/sim1', 'dir')
-        mkdir('Figures/sim1');
+    if saveNewData
+        filename = ['Figures/sim', filenameSuffix, '/gridAndCast', num2str(i), '.jpg'];
+        if ~exist(['Figures/sim', filenameSuffix], 'dir')
+            mkdir(['Figures/sim', filenameSuffix]);
+        end
+        saveas(f, filename)
     end
-    saveas(f, filename)
     pause(0.00001)
     hold off
 end

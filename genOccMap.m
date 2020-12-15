@@ -25,8 +25,8 @@ for i = 1:numStepUp
 end
 
 % populate some more flat ground
-map(1:currentHeight, currentX+1:currentX+50) = 1;
-currentX = currentX + 50;
+map(1:currentHeight, currentX+1:currentX+30) = 1;
+currentX = currentX + 30;
 
 % populate some steps down
 for i = 1:numStepDown

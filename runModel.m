@@ -9,7 +9,8 @@ clear
 clc
 
 %% Read Recorded Data and saved laser object
-filenameSuffix = '12111945';
+saveNewData = false;
+filenameSuffix = '12141747';
 saveSimMeas = load(['Data/saveSimMeas', filenameSuffix, '.txt']);
 saveIdealMeas = load(['Data/saveIdealMeas', filenameSuffix, '.txt']);
 trueTrajectory = load(['Data/trueTrajectory', filenameSuffix, '.txt']); % (3, n) x, y, theta
@@ -56,15 +57,15 @@ hold on
 scatter(pose(1), pose(2), '*')
 scatter(truePose(1), truePose(2), 'o')
 
-for i = 2:numScans
+for i = 2:69
     % Read in range measurements from saved data file
     laser.simMeas = saveSimMeas(i, :);
     laser.idealMeas = saveIdealMeas(i, :);
 
     % Remove outliers from the range readings
-    [~, outlierIdx] = rmoutliers(laser.simMeas);
+    [~, outlierIdx] = rmoutliers(laser.simMeas, 'percentiles', [1, 90]);
     laser.simMeas(outlierIdx) = NaN;
-    [~, outlierIdx] = rmoutliers(laser.idealMeas);
+    [~, outlierIdx] = rmoutliers(laser.idealMeas, 'percentiles', [1, 90]);
     laser.idealMeas(outlierIdx) = NaN;
     
     % create t+1 lidar scan
@@ -88,7 +89,7 @@ for i = 2:numScans
     plot(newScanTformd)
     hold on
     plot(refScan)
-    title('Aligned Scans')
+    title(['Aligned Scans; rmse = ', num2str(error)])
     hold off
     
     mapPoints = transformScan(newScanTformd, pose);
@@ -111,19 +112,36 @@ for i = 2:numScans
     scatter(pose(1), pose(2), 'b*')
     scatter(truePose(1), truePose(2), 'ro')
     legend('Plotted map', 'est pose', 'true pose')
-    filename = ['Figures/run1/mapAndTraj', num2str(i), '.jpg'];
-    if ~exist('Figures/run1', 'dir')
-        mkdir('Figures/run1');
+    if saveNewData
+        filename = ['Figures/run', filenameSuffix, '/mapAndTraj', num2str(i), '.jpg'];
+        if ~exist(['Figures/run', filenameSuffix], 'dir')
+            mkdir(['Figures/run', filenameSuffix]);
+        end
+        saveas(f, filename)
     end
-    saveas(f, filename)
     
     % Update refScan for next step
     refScan = newScan;
     pause(0.001)
 end
 
-figure
+g = figure;
 plot(estTrajectory(1,:), estTrajectory(2,:), 'LineWidth', 2)
 hold on
 plot(trueTrajectory(1,:), trueTrajectory(2,:), '--', 'LineWidth', 3)
 legend('est', 'ground truth')
+title('Trajectory Comparison')
+if saveNewData
+    filename = ['Figures/trajectoryComparison', filenameSuffix, '.jpg'];
+    saveas(g,filename)
+end
+
+trajDiff = sqrt((trueTrajectory(1,:)-estTrajectory(1,:)).^2 +...
+    (trueTrajectory(2,:)-estTrajectory(2,:)).^2);
+h = figure;
+plot(1:numScans, trajDiff, 'LineWidth', 2)
+title('Euclidean distance between estimated and ground truth trajectory')
+xlabel('Frame number')
+ylabel('Error distance (cm)')
+filename = ['Figures/trajectoryDifference', filenameSuffix, '.jpg'];
+saveas(h,filename)
